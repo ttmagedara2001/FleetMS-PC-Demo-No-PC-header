@@ -357,10 +357,10 @@ function RobotFleetPanel() {
     };
 
     return (
-        <div className="space-y-1 md:space-y-2">
+        <div className="space-y-1 md:space-y-2 min-w-0">
             {/* Header with Stats */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between min-w-0">
+                <div className="flex items-center gap-2 min-w-0">
                     <h3 className="font-semibold text-gray-900">Robot Fleet</h3>
                     <button
                         onClick={handleRefresh}
@@ -375,9 +375,9 @@ function RobotFleetPanel() {
                         )}
                     </button>
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className="bg-accent-gold-light text-primary-700 rounded-full px-3 py-1 text-xs font-medium">{robots.length} robot(s) connected</span>
-                    <div className="flex items-center gap-3 text-xs">
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 min-w-0">
+                    <span className="bg-accent-gold-light text-primary-700 rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap">{robots.length} robot(s) connected</span>
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs">
                         <span className="flex items-center gap-1">
                             <span className="w-2 h-2 rounded-full bg-green-500" />
                             Active: {stats.active}
