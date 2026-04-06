@@ -455,7 +455,20 @@ const MobileNotifButton = ({ onClick, title, danger, icon: Icon, label }) => {
 
 function Header({ onMenuToggle, sidebarOpen }) {
     const { isAuthenticated, isDemoMode } = useAuth();
-    const { alerts, isConnected, clearAlert, clearAllAlerts, markAlertRead, markAllAlertsRead } = useDevice();
+    const {
+        alerts,
+        isConnected,
+        clearAlert,
+        clearAllAlerts,
+        markAlertRead,
+        markAllAlertsRead,
+        factories,
+        selectedFactoryId,
+        setSelectedFactoryId,
+        devices,
+        selectedDeviceId,
+        setSelectedDeviceId,
+    } = useDevice();
 
     const unreadAlerts = alerts.filter(a => !a.read).length;
     const [showNotifications, setShowNotifications] = useState(false);
@@ -572,6 +585,14 @@ function Header({ onMenuToggle, sidebarOpen }) {
         setShowNotifications(s => !s);
     };
 
+    const handleFactoryChange = (factoryId) => {
+        setSelectedFactoryId(factoryId);
+        const fallbackDeviceId = factories.find(factory => factory.id === factoryId)?.devices?.[0]?.id;
+        if (fallbackDeviceId) {
+            setSelectedDeviceId(fallbackDeviceId);
+        }
+    };
+
     return (
         <>
             <header
@@ -605,6 +626,41 @@ function Header({ onMenuToggle, sidebarOpen }) {
 
                 {/* Spacer */}
                 <div className="flex-1" />
+
+                {/* Factory + Device selectors */}
+                <div className="header-device-wrap hidden md:flex items-center gap-2 mr-2 lg:mr-4">
+                    <div className="header-device-wrapper">
+                        <select
+                            className="header-device-selector"
+                            aria-label="Select factory location"
+                            value={selectedFactoryId}
+                            onChange={(e) => handleFactoryChange(e.target.value)}
+                            title="Select factory location"
+                            style={{ minWidth: '176px' }}
+                        >
+                            {factories.map(factory => (
+                                <option key={factory.id} value={factory.id}>
+                                    {factory.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="header-device-wrapper">
+                        <select
+                            className="header-device-selector"
+                            aria-label="Select device"
+                            value={selectedDeviceId}
+                            onChange={(e) => setSelectedDeviceId(e.target.value)}
+                            title="Select device"
+                        >
+                            {devices.map(device => (
+                                <option key={device.id} value={device.id}>
+                                    {device.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
 
                 {/* Date/Time — hidden on small portrait screens */}
                 <div className="header-datetime hidden lg:flex flex-col items-end text-white/90 mr-5">

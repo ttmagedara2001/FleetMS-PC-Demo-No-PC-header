@@ -18,11 +18,29 @@ export const ROBOT_REGISTRY = {
 
   // Device: devicetestuc
   devicetestuc: [
-    { id: "R-001", name: "Alpha", type: "Delivery", zone: "Zone A" },
-    { id: "R-002", name: "Beta", type: "Delivery", zone: "Zone B" },
-    { id: "R-003", name: "Gamma", type: "Delivery", zone: "Zone C" },
-    { id: "R-004", name: "Delta", type: "Delivery", zone: "Zone D" },
-    { id: "R-005", name: "Epsilon", type: "Delivery", zone: "Zone E" },
+    { id: "R-301", name: "Vega", type: "Delivery", zone: "Assembly Hall" },
+    { id: "R-302", name: "Lyra", type: "Delivery", zone: "Packaging Zone" },
+    { id: "R-303", name: "Altair", type: "Delivery", zone: "Receiving Dock" },
+    { id: "R-304", name: "Sirius", type: "Delivery", zone: "QC Lab" },
+    { id: "R-305", name: "Rigel", type: "Delivery", zone: "Staging Area" },
+  ],
+
+  // Device: deviceA72Q
+  deviceA72Q: [
+    { id: "R-401", name: "Kumo", type: "Delivery", zone: "Assembly Hall" },
+    { id: "R-402", name: "Yuki", type: "Delivery", zone: "Packaging Zone" },
+    { id: "R-403", name: "Tora", type: "Delivery", zone: "Receiving Dock" },
+    { id: "R-404", name: "Hana", type: "Delivery", zone: "QC Lab" },
+    { id: "R-405", name: "Sora", type: "Delivery", zone: "Spares Vault" },
+  ],
+
+  // Device: deviceZX91
+  deviceZX91: [
+    { id: "R-501", name: "Mistral", type: "Delivery", zone: "Assembly Hall" },
+    { id: "R-502", name: "Zephyr", type: "Delivery", zone: "Packaging Zone" },
+    { id: "R-503", name: "Bora", type: "Delivery", zone: "Receiving Dock" },
+    { id: "R-504", name: "Sirocco", type: "Delivery", zone: "QC Lab" },
+    { id: "R-505", name: "Tradewind", type: "Delivery", zone: "Staging Area" },
   ],
 
   // Device: device0011233

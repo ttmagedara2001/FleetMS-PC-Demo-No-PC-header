@@ -19,11 +19,12 @@ import {
 } from 'lucide-react';
 import { useDevice } from '../contexts/DeviceContext';
 import { toggleAC, setAirPurifier } from '../services/api';
+import { getFactoryMapZones } from '../config/factoryRegistry';
 import { TASK_PHASES, PHASE_LABELS, PHASE_COLORS, FACILITY_BOUNDS as SHARED_FACILITY_BOUNDS, gpsToPercent as sharedGpsToPercent, percentToGps as sharedPercentToGps } from '../utils/telemetryMath';
 
 // Fab Map Component
 function FabMap() {
-    const { currentRobots } = useDevice();
+    const { currentRobots, currentFactory } = useDevice();
     const [selectedRobot, setSelectedRobot] = useState(null);
     const [clickedCoords, setClickedCoords] = useState(null); // { lat, lng, x, y }
     const mapRef = useRef(null);
@@ -31,14 +32,7 @@ function FabMap() {
     const robots = Object.values(currentRobots || {});
 
     // Zone definitions
-    const zones = [
-        { id: 'cleanroom-a', name: 'Cleanroom A', left: '5%', top: '5%', width: '35%', height: '40%', type: 'cleanroom' },
-        { id: 'cleanroom-b', name: 'Cleanroom B', left: '45%', top: '5%', width: '30%', height: '40%', type: 'cleanroom' },
-        { id: 'loading', name: 'Loading Bay', left: '5%', top: '55%', width: '25%', height: '35%', type: 'loading' },
-        { id: 'storage', name: 'Storage', left: '35%', top: '55%', width: '25%', height: '35%', type: 'storage' },
-        { id: 'maintenance', name: 'Maintenance', left: '65%', top: '55%', width: '25%', height: '25%', type: 'storage' },
-        { id: 'parking', name: 'Reset Position (Ready)', left: '65%', top: '82%', width: '25%', height: '10%', type: 'reset' },
-    ];
+    const zones = getFactoryMapZones(currentFactory?.id);
 
     // Use shared facility bounds and GPS conversion from telemetryMath (single source of truth)
     const FACILITY_BOUNDS = SHARED_FACILITY_BOUNDS;

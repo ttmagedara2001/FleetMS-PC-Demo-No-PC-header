@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { connectWebSocket } from '../services/webSocketClient';
 import { getStateDetails, updateStateDetails, getTopicStreamData, getTopicStateDetails, getTimeRange } from '../services/api';
 import { getRobotsForDevice, DEFAULT_ROBOT_SENSOR_DATA, ROBOT_STATUS } from '../config/robotRegistry';
+import { FACTORY_LOCATIONS, ALL_DEVICES, getFactoryForDevice } from '../config/factoryRegistry';
 import {
     TASK_PHASES, PHASE_LABELS,
     haversineDistance, ARRIVAL_THRESHOLD_M, COLLISION_THRESHOLD_M, AUTO_ADVANCE_DELAY_MS,
@@ -31,16 +32,6 @@ const isActiveTaskStatus = (status) => {
         s === 'en_route_to_source' || s === 'picking_up' ||
         s === 'en_route_to_destination' || s === 'delivering';
 };
-
-// Available devices
-const DEVICES = [
-    { id: 'deviceTestUC', name: 'deviceTestUC', zone: 'Testing' },
-    { id: 'devicetestuc', name: 'devicetestuc', zone: 'Testing' },
-    { id: 'device9988', name: 'Device 9988', zone: 'Cleanroom A' },
-    { id: 'device0011233', name: 'Device 0011233', zone: 'Cleanroom B' },
-    { id: 'deviceA72Q', name: 'Device A72Q', zone: 'Loading Bay' },
-    { id: 'deviceZX91', name: 'Device ZX91', zone: 'Storage' }
-];
 
 const DEFAULT_DEVICE_STATE = {
     environment: {
@@ -81,19 +72,42 @@ export function DeviceProvider({ children }) {
     const [selectedDeviceId, setSelectedDeviceId] = useState(() => {
         try {
             const saved = localStorage.getItem('fabrix_selectedDeviceId');
-            if (saved && DEVICES.some(d => d.id === saved)) {
+            if (saved && ALL_DEVICES.some(d => d.id === saved)) {
                 return saved;
             }
         } catch (e) {
             console.error('[Device] Failed to load selectedDeviceId:', e);
         }
-        return DEVICES[0].id;
+        return ALL_DEVICES[0].id;
     });
+
+    const [selectedFactoryId, setSelectedFactoryId] = useState(() => {
+        try {
+            const savedFactory = localStorage.getItem('fabrix_selectedFactoryId');
+            if (savedFactory && FACTORY_LOCATIONS.some(factory => factory.id === savedFactory)) {
+                return savedFactory;
+            }
+
+            const savedDevice = localStorage.getItem('fabrix_selectedDeviceId');
+            if (savedDevice) {
+                const factory = getFactoryForDevice(savedDevice);
+                if (factory) return factory.id;
+            }
+        } catch (e) {
+            console.error('[Device] Failed to load selectedFactoryId:', e);
+        }
+        return FACTORY_LOCATIONS[0].id;
+    });
+
+    const devices = useMemo(
+        () => ALL_DEVICES.filter(device => device.factoryId === selectedFactoryId),
+        [selectedFactoryId]
+    );
 
     const [deviceData, setDeviceData] = useState(() => {
         // Pre-populate with mock environment readings for demo
         const initial = {};
-        DEVICES.forEach(device => {
+        ALL_DEVICES.forEach(device => {
             const envSnap = getEnvironmentSnapshot(device.id);
             initial[device.id] = {
                 ...DEFAULT_DEVICE_STATE,
@@ -119,7 +133,7 @@ export function DeviceProvider({ children }) {
     // Initialize robots state with mock data from MockDataService
     const [robots, setRobots] = useState(() => {
         const robotState = {};
-        DEVICES.forEach(device => {
+        ALL_DEVICES.forEach(device => {
             // Get pre-built mock robot data with realistic positions/battery/temp
             const mockRobots = getRobotsSnapshot(device.id);
             robotState[device.id] = {};
@@ -153,7 +167,7 @@ export function DeviceProvider({ children }) {
     // Time-series histories for Analysis graphs/tables — pre-populated with mock data
     const [envHistory, setEnvHistory] = useState(() => {
         const h = {};
-        DEVICES.forEach(d => {
+        ALL_DEVICES.forEach(d => {
             h[d.id] = generateEnvHistory(d.id, 24, 200);
         });
         return h;
@@ -161,7 +175,7 @@ export function DeviceProvider({ children }) {
 
     const [robotHistory, setRobotHistory] = useState(() => {
         const rh = {};
-        DEVICES.forEach(d => {
+        ALL_DEVICES.forEach(d => {
             rh[d.id] = generateRobotHistory(d.id, 24, 100);
         });
         return rh;
@@ -215,6 +229,22 @@ export function DeviceProvider({ children }) {
         }
     }, [selectedDeviceId]);
 
+    useEffect(() => {
+        try {
+            localStorage.setItem('fabrix_selectedFactoryId', selectedFactoryId);
+        } catch (e) {
+            console.error('[Device] Failed to save selectedFactoryId:', e);
+        }
+    }, [selectedFactoryId]);
+
+    // Keep selected device in sync with currently selected factory.
+    useEffect(() => {
+        if (!devices.length) return;
+        if (!devices.some(device => device.id === selectedDeviceId)) {
+            setSelectedDeviceId(devices[0].id);
+        }
+    }, [devices, selectedDeviceId]);
+
     // Note: deviceData and robots are NO LONGER persisted to localStorage
     // to ensure dashboard starts fresh on reload as requested.
 
@@ -266,7 +296,8 @@ export function DeviceProvider({ children }) {
     }, [selectedDeviceId, isAuthenticated]);
 
     // Get current device data
-    const currentDevice = DEVICES.find(d => d.id === selectedDeviceId);
+    const currentFactory = FACTORY_LOCATIONS.find(factory => factory.id === selectedFactoryId) || FACTORY_LOCATIONS[0];
+    const currentDevice = ALL_DEVICES.find(d => d.id === selectedDeviceId);
     const currentDeviceData = deviceData[selectedDeviceId] || DEFAULT_DEVICE_STATE;
 
     // Ensure currentRobots always contains registry robots (at least 5)
@@ -2052,7 +2083,12 @@ export function DeviceProvider({ children }) {
         connectionError,
 
         // Device management
-        devices: DEVICES,
+        factories: FACTORY_LOCATIONS,
+        selectedFactoryId,
+        setSelectedFactoryId,
+        currentFactory,
+        devices,
+        allDevices: ALL_DEVICES,
         selectedDeviceId,
         setSelectedDeviceId,
         currentDevice,
