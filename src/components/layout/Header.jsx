@@ -462,9 +462,7 @@ function Header({ onMenuToggle, sidebarOpen }) {
         clearAllAlerts,
         markAlertRead,
         markAllAlertsRead,
-        factories,
-        selectedFactoryId,
-        setSelectedFactoryId,
+        devices,
         selectedDeviceId,
         setSelectedDeviceId,
     } = useDevice();
@@ -584,18 +582,16 @@ function Header({ onMenuToggle, sidebarOpen }) {
         setShowNotifications(s => !s);
     };
 
-    const handleDeviceChange = (deviceId) => {
-        const matchedFactory = factories.find((factory) =>
-            factory.devices?.some((device) => device.id === deviceId)
-        );
+    const selectedDevice = devices.find((device) => device.id === selectedDeviceId) || devices[0] || null;
 
-        if (matchedFactory && matchedFactory.id !== selectedFactoryId) {
-            setSelectedFactoryId(matchedFactory.id);
+    const areaOptions = ['Area 1', 'Area 2', 'Area 3', 'Area 4'];
+
+    const handleDeviceChange = (areaName) => {
+        const nextDevice = devices.find((device) => device.name === areaName);
+        if (nextDevice) {
+            setSelectedDeviceId(nextDevice.id);
         }
-        setSelectedDeviceId(deviceId);
     };
-
-    const allDeviceOptions = factories.flatMap((factory) => factory.devices || []);
 
     return (
         <>
@@ -637,13 +633,13 @@ function Header({ onMenuToggle, sidebarOpen }) {
                         <select
                             className="header-device-selector"
                             aria-label="Select device"
-                            value={selectedDeviceId}
+                            value={selectedDevice?.name || ''}
                             onChange={(e) => handleDeviceChange(e.target.value)}
                             title="Select device"
                         >
-                            {allDeviceOptions.map(device => (
-                                <option key={device.id} value={device.id}>
-                                    {device.name}
+                            {areaOptions.map((areaName) => (
+                                <option key={areaName} value={areaName}>
+                                    {areaName}
                                 </option>
                             ))}
                         </select>
