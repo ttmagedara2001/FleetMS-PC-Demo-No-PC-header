@@ -10,16 +10,22 @@ export const FACTORY_LOCATIONS = [
     name: "Colombo Factory",
     devices: [
       {
-        id: "deviceTestUC",
-        name: "Device Test UC",
+        id: "colombo-area-1",
+        name: "Area 1",
         zone: "Cleanroom A",
         factoryId: "factory-colombo",
       },
-      { id: "device9988", name: "Device 9988", zone: "Cleanroom B", factoryId: "factory-colombo" },
+      { id: "colombo-area-2", name: "Area 2", zone: "Cleanroom B", factoryId: "factory-colombo" },
       {
-        id: "device0011233",
-        name: "Device 0011233",
+        id: "colombo-area-3",
+        name: "Area 3",
         zone: "Loading Bay",
+        factoryId: "factory-colombo",
+      },
+      {
+        id: "colombo-area-4",
+        name: "Area 4",
+        zone: "Storage",
         factoryId: "factory-colombo",
       },
     ],
@@ -85,13 +91,14 @@ export const FACTORY_LOCATIONS = [
     name: "Kandy Factory",
     devices: [
       {
-        id: "devicetestuc",
-        name: "Device Test UC 2",
+        id: "kandy-area-1",
+        name: "Area 1",
         zone: "Assembly Hall",
         factoryId: "factory-kandy",
       },
-      { id: "deviceA72Q", name: "Device A72Q", zone: "QC Lab", factoryId: "factory-kandy" },
-      { id: "deviceZX91", name: "Device ZX91", zone: "Docking Bay", factoryId: "factory-kandy" },
+      { id: "kandy-area-2", name: "Area 2", zone: "QC Lab", factoryId: "factory-kandy" },
+      { id: "kandy-area-3", name: "Area 3", zone: "Docking Bay", factoryId: "factory-kandy" },
+      { id: "kandy-area-4", name: "Area 4", zone: "Packaging Zone", factoryId: "factory-kandy" },
     ],
     mapZones: [
       {

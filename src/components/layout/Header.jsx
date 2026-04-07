@@ -465,7 +465,6 @@ function Header({ onMenuToggle, sidebarOpen }) {
         factories,
         selectedFactoryId,
         setSelectedFactoryId,
-        devices,
         selectedDeviceId,
         setSelectedDeviceId,
     } = useDevice();
@@ -585,13 +584,18 @@ function Header({ onMenuToggle, sidebarOpen }) {
         setShowNotifications(s => !s);
     };
 
-    const handleFactoryChange = (factoryId) => {
-        setSelectedFactoryId(factoryId);
-        const fallbackDeviceId = factories.find(factory => factory.id === factoryId)?.devices?.[0]?.id;
-        if (fallbackDeviceId) {
-            setSelectedDeviceId(fallbackDeviceId);
+    const handleDeviceChange = (deviceId) => {
+        const matchedFactory = factories.find((factory) =>
+            factory.devices?.some((device) => device.id === deviceId)
+        );
+
+        if (matchedFactory && matchedFactory.id !== selectedFactoryId) {
+            setSelectedFactoryId(matchedFactory.id);
         }
+        setSelectedDeviceId(deviceId);
     };
+
+    const allDeviceOptions = factories.flatMap((factory) => factory.devices || []);
 
     return (
         <>
@@ -627,33 +631,17 @@ function Header({ onMenuToggle, sidebarOpen }) {
                 {/* Spacer */}
                 <div className="flex-1" />
 
-                {/* Factory + Device selectors */}
+                {/* Device selector */}
                 <div className="header-device-wrap hidden md:flex items-center gap-2 mr-2 lg:mr-4">
-                    <div className="header-device-wrapper">
-                        <select
-                            className="header-device-selector"
-                            aria-label="Select factory location"
-                            value={selectedFactoryId}
-                            onChange={(e) => handleFactoryChange(e.target.value)}
-                            title="Select factory location"
-                            style={{ minWidth: '176px' }}
-                        >
-                            {factories.map(factory => (
-                                <option key={factory.id} value={factory.id}>
-                                    {factory.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
                     <div className="header-device-wrapper">
                         <select
                             className="header-device-selector"
                             aria-label="Select device"
                             value={selectedDeviceId}
-                            onChange={(e) => setSelectedDeviceId(e.target.value)}
+                            onChange={(e) => handleDeviceChange(e.target.value)}
                             title="Select device"
                         >
-                            {devices.map(device => (
+                            {allDeviceOptions.map(device => (
                                 <option key={device.id} value={device.id}>
                                     {device.name}
                                 </option>
